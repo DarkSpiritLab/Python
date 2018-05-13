@@ -13,7 +13,7 @@ channel.queue_declare(queue="relayInfor")
 
 def sendToRabbitMQ(infor):
 	channel.basic_publish(exchange='',routing_key='relayInfor',body=infor)
-	print infor
+	#print infor
 
 server_address = '/home/uds_socket'
 
@@ -31,7 +31,7 @@ sock.bind(server_address)
 
 # Listen for incoming connections
 sock.listen(100)
-
+sendlist = list()
 while True:
     # Wait for a connection
     #print >>sys.stderr, 'waiting for a connection'
@@ -46,6 +46,7 @@ while True:
             data += temp
             if not(temp):
                 break
+        sendlist.append(data)
         sendToRabbitMQ(data)
     finally:
         # Clean up the connection

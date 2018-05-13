@@ -7,13 +7,19 @@ import json
 import time
 import pika
 import threading
+import  pySetting
 
-url_lastblock = "http://blockchain.info/latestblock" 
-url_rawblock = "http://blockchain.info/rawblock/"
+
 rabbitMqServerIP = "10.11.49.71"
 rabbitMqServerPort = 5672
 
-credentialsSend = pika.PlainCredentials("test","test")
+username ="test"
+password = "test"
+
+url_lastblock = "http://blockchain.info/latestblock" 
+url_rawblock = "http://blockchain.info/rawblock/"
+
+credentialsSend = pika.PlainCredentials(username,password)
 connectionSend = pika.BlockingConnection(pika.ConnectionParameters(rabbitMqServerIP,rabbitMqServerPort,'/',credentialsSend))
 channelSend = connectionSend.channel()
 channelSend.queue_declare(queue="btcResult")
@@ -65,7 +71,7 @@ def search():
         time.sleep(500)
 
 def receive():
-    credentials = pika.PlainCredentials("test","test")
+    credentials = pika.PlainCredentials(username,password)
     connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitMqServerIP,rabbitMqServerPort,'/',credentials))
     channel = connection.channel()
     channel.queue_declare(queue="btcAddr")

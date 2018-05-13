@@ -1,0 +1,28 @@
+//stream id in this may to remove in future
+//type:("relay"|"exist") //"exist" is client or hidden server and relay" maybe in the middle ?
+{
+    type:"relay",
+    info:{
+      next_ip:"10.0.0.2",
+      port:8888,
+      last_circ_id:1111,
+      next_circ_id:1234,
+      stream_id:1  } 
+};
+//stream join to the before 
+{
+    type:"streamjoin",
+    info:{
+      next_ip:"10.0.0.2",
+      port:8888,
+      next_circ_id:1234,
+      stream_id:5678 
+    }
+};
+// cell_t not in json
+typedef struct cell_t {
+    circid_t circ_id; /**< Circuit which received the cell. */
+    uint8_t command; /**< Type of the cell: one of CELL_PADDING, CELL_CREATE,
+                      * CELL_DESTROY, etc */
+    uint8_t payload[CELL_PAYLOAD_SIZE]; /**< Cell body. */
+  } cell_t;

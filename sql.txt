@@ -1,0 +1,15 @@
+
+
+表名： relayInfor
+
+(my_ip,                        char  >16
+next_ip,						char  >16
+next_port,						int
+prev_circ_id,					int
+next_circ_id,                   int
+direction,                      int
+stream_id                        int
+is_origin
+	int
+////////  不要了 /cell_payload)                   (动态存储 二进制 什么的的数据类型)
++time							DATETIME

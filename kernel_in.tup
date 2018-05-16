@@ -1,0 +1,2 @@
+(my_ip,next_ip,next_port,prev_circ_id,next_circ_id,direction,stream_id,is_origin);
+(my_ip,next_ip,next_port,prev_circ_id,next_circ_id,direction,cell_payload);

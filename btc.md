@@ -1,4 +1,4 @@
-# 区块链转账示警
+﻿# 区块链转账示警
 |内容|值|
 | ----- | ---- |
 | 币种 | {{ coin_type }} |
@@ -17,7 +17,7 @@
 |转出账户 | {% for i in output_accounts %} {{ i }}<br/> {% endfor %} |
 |转入账户 | {% for i in input_accounts %} {{ i }}<br/> {% endfor %} |
 |交易哈希 | {{ hash }} |
-|重量 | {{ weighht }} |
+|重量 | {{ weight }} |
 |转出金额 | {{ recv_amount }} |
 |手续费 | {{ fees }} |
 |块号 |{{ block_height }}|

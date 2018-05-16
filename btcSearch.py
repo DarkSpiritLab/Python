@@ -37,8 +37,9 @@ def searchTransactionByHash(blockhash):
     req = urllib2.Request(url_rawblock+blockhash)
     infor = urllib2.urlopen(req).read()
     blockJson = json.loads(infor)
-    tx = blockJson["tx"]
-    return tx
+    return blockJson
+    #tx = blockJson["tx"]
+    #return tx
 
 def sendResultToRabbitMQ(result):
     infor = json.dumps(result)
@@ -49,8 +50,9 @@ def search():
     while True:
         lastHash = searchLastblockHash()
         #print lastHash
-        tranLists = searchTransactionByHash(lastHash)
+        tran = searchTransactionByHash(lastHash)
         result = list()
+        tranLists = tran["tx"]
         for i in tranLists:
             if i.has_key("out") == False:
                 break;
@@ -61,7 +63,7 @@ def search():
                    continue
                for k in addresses:
                    if k["addr"] == j["addr"]:
-                       item = {"monitor":k,"tx":j}
+                       item = {"monitor":k,"amount":j["value"],"tx_index":j["tx_index"],"height":tran["height"],"tx":i}
                        result.append(item)
         #print "\nresult = addrs = "
         #print result

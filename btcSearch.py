@@ -69,9 +69,11 @@ def search():
         #print "\nresult = addrs = "
         #print result
         #print addresses
+        print "Btc Addrs now is : " + str(addresses)
+        print "This time find : " + str(result)
         if result:
             sendResultToRabbitMQ(result)
-        time.sleep(500)
+        time.sleep(5)
 
 def receive():
     credentials = pika.PlainCredentials(username,password)

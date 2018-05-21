@@ -60,6 +60,7 @@ def btc2md(body):
     tx_id = infor["tx_index"]
     outfileInfor = template.render(coin_type=coin_type,receive_account=receive_account,onion_site=onion_site,username=username,send_amount=send_amount,time=time,currency=currency,size=size,output_accounts=output_accounts,input_accounts=input_accounts,hash=hash,recv_amount=in_amount,weight=weight,fees=fees,block_height=block_height,block_time=block_time,url=url,tx_id=tx_id)
     outfile = open(hash+str(time)+".md","wb")
+    print "MD : "+hash +"\n INFOR:\n"+outfileInfor
     outfile.write(outfileInfor.encode("utf-8"))
     outfile.close()
 
@@ -68,6 +69,7 @@ def btc2md(body):
 
 
 for method_fram,properties,body in channel.consume("btcAddr"):
+    print "Receive from RabbitMQ!"
     btc2md(body)
     channel.basic_ack(delivery_tag = method_fram.delivery_tag)
 

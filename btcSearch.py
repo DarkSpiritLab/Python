@@ -10,11 +10,11 @@ import threading
 import  pySetting
 
 
-rabbitMqServerIP = "10.11.49.71"
+rabbitMqServerIP = "222.20.73.252"
 rabbitMqServerPort = 5672
 
-username ="test"
-password = "test"
+username ="dark"
+password = "darkGenius"
 
 url_lastblock = "http://blockchain.info/latestblock" 
 url_rawblock = "http://blockchain.info/rawblock/"

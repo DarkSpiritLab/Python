@@ -7,11 +7,11 @@ import json
 import urllib
 import urllib2
 
-rabbitMqServerIP = "10.11.49.71"
+rabbitMqServerIP = "222.20.73.252"
 rabbitMqServerPort = 5672
 
-username ="test"
-password = "test"
+username ="dark"
+password = "darkGenius"
 
 credentials = pika.PlainCredentials(username,password)
 connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitMqServerIP,rabbitMqServerPort,'/',credentials))

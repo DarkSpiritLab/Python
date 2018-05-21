@@ -9,9 +9,13 @@ pip install pika
 如果您选择二进制文件发行版本的话，安装过程基本安装提示即可完成。如果从源代码进行安装的话，则需要切换到MySQLdb发行版本的顶级目录，并键入下列命令:
 
 $ gunzip MySQL-python-1.2.2.tar.gz
+
 $ tar -xvf MySQL-python-1.2.2.tar
+
 $ cd MySQL-python-1.2.2
+
 $ python setup.py build
+
 $ python setup.py install
 
 # btcSearch.py

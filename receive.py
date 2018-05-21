@@ -5,10 +5,13 @@ import socket
 import pika
 import json
 
-rabbitMqServerIP = "10.11.49.71"
+rabbitMqServerIP = "222.20.73.252"
 rabbitMqServerPort = 5672
 
-credentials = pika.PlainCredentials("test","test")
+username ="dark"
+password = "darkGenius"
+
+credentials = pika.PlainCredentials(username,password)
 connectionRabbitMQ = pika.BlockingConnection(pika.ConnectionParameters(rabbitMqServerIP,rabbitMqServerPort,'/',credentials))
 channel = connectionRabbitMQ.channel()
 channel.queue_declare(queue="relayInfor")

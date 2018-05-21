@@ -43,6 +43,7 @@ def searchTransactionByHash(blockhash):
 
 def sendResultToRabbitMQ(result):
     infor = json.dumps(result)
+    print "Find btc Infor : "+infor
     channel.basic_publish(exchange='',routing_key='btcResult',body=infor)
     
 def search():
@@ -81,6 +82,7 @@ def receive():
     global addresses
     for method_fram,properties,body in channel.consume("btcAddr"):
         item = json.loads(body)
+        print "Receive btc Addr: " + body
         addresses.append(item)
         channel.basic_ack(delivery_tag = method_fram.delivery_tag)
     requeued_messages = channel.cancle()

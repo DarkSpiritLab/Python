@@ -44,7 +44,7 @@ def searchTransactionByHash(blockhash):
 def sendResultToRabbitMQ(result):
     infor = json.dumps(result)
     print "Find btc Infor : "+infor
-    channel.basic_publish(exchange='',routing_key='btcResult',body=infor)
+    channelSend.basic_publish(exchange='',routing_key='btcResult',body=infor)
     
 def search():
     global addresses

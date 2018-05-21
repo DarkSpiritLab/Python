@@ -7,7 +7,7 @@ import json
 import time
 import pika
 import threading
-import  pySetting
+#import  pySetting
 
 
 rabbitMqServerIP = "222.20.73.252"
@@ -43,7 +43,7 @@ def searchTransactionByHash(blockhash):
 
 def sendResultToRabbitMQ(result):
     infor = json.dumps(result)
-    channel.basic_publish(exchange='',routing_key='btcAddr',body=infor)
+    channel.basic_publish(exchange='',routing_key='btcResult',body=infor)
     
 def search():
     global addresses

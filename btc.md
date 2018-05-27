@@ -24,9 +24,6 @@
 |区块时间戳 | {{ block_time }} |
 
 
-详情： [点击查看]( https://blockchain.info/tx/ 
+详情： [点击查看]( https://blockchain.info/tx/{{ url }})
 
-{{ url }})
-资金流向图： [点击查看](https://blockchain.info/tree/ 
-
-{{ tx_id }})
+资金流向图： [点击查看](https://blockchain.info/tree/{{ tx_id }})

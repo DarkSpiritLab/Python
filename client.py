@@ -9,13 +9,13 @@ import json
 import time
 import pika
 import threading
-import rabbitMq.rabbitMq
+from rabbitMq import rabbitMQ
 
 queueName = "clientReceive"
 queueEnd = "clientEnd"
 workList = {"url":"xxx.onio","state":True,"level":"1"}
 
-rmq= rabbitMq()
+rmq= rabbitMQ()
 
 def receiveEnd():
     credentials = pika.PlainCredentials(rmq.getUser(), rmq.getPassword())

@@ -65,8 +65,6 @@ def receiveEnd():
             break
         else:
             channel.basic_publish(exchange='', routing_key=queueEnd, body=body)
-    requeued_messages = channel.cancle()
-    print ('Requeued %i messages' % requeued_messages)
     connection.close()
     print "receiveEnd end"
 

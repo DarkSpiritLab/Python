@@ -13,17 +13,21 @@ import pika
 from rabbitMq import rabbitMQ
 
 class clientWork:
-    rmq= rabbitMQ()
-    rabbitMqServerIP = rmq.getIP()
-    rabbitMqServerPort = rmq.getPort()
-    username = rmq.getUser()
-    password = rmq.getPassword()
     queueStartName = "clientReceive"
     queueEndName = "clientEnd"
     queueResultName = "clientResult"
     url = ""
     level = ""
+    rabbitMqServerIP = ""
+    rabbitMqServerPort = ""
+    username = ""
+    password = ""
     def __init__(self,url,level):
+        rmq= rabbitMQ()
+        self.rabbitMqServerIP = rmq.getIP()
+        self.rabbitMqServerPort = rmq.getPort()
+        self.username = rmq.getUser()
+        self.password = rmq.getPassword()
         self.url=url
         self.level=level
 
@@ -40,9 +44,9 @@ class clientWork:
         connectionRabbitMQ.close()
 
     def sendEnd(self):
-        credentials = pika.PlainCredentials(username, password)
+        credentials = pika.PlainCredentials(self.username, self.password)
         connectionRabbitMQ = pika.BlockingConnection(
-            pika.ConnectionParameters(rabbitMqServerIP, rabbitMqServerPort, '/', credentials))
+            pika.ConnectionParameters(self.rabbitMqServerIP, self.rabbitMqServerPort, '/', credentials))
         channel = connectionRabbitMQ.channel()
         channel.queue_declare(queue=self.queueEndName)
         infor = {"url": self.url, "level": self.level, "state": False}
@@ -50,19 +54,19 @@ class clientWork:
         channel.basic_publish(exchange='', routing_key=self.queueEndName, body=body)
         connectionRabbitMQ.close()
 
-    def receiveCleint(self):
-        credentials = pika.PlainCredentials(username, password)
+    def receiveClient(self):
+        credentials = pika.PlainCredentials(self.username, self.password)
         connectionRabbitMQ = pika.BlockingConnection(
-            pika.ConnectionParameters(rabbitMqServerIP, rabbitMqServerPort, '/', credentials))
+            pika.ConnectionParameters(self.rabbitMqServerIP, self.rabbitMqServerPort, '/', credentials))
         channel = connectionRabbitMQ.channel()
         channel.queue_declare(queue=self.queueResultName)
+        channel.basic_qos(prefetch_count=1)
         result = {}
         for method_fram, properties, body in channel.consume(self.queueResultName):
             result = json.loads(body)
             print "Receive client result: " + body
             channel.basic_ack(delivery_tag=method_fram.delivery_tag)
             break
-        channel.cancle()
         connection.close()
         return result
 

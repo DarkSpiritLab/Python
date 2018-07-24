@@ -42,6 +42,7 @@ def sendWork(infor):
     infor["num"]=infor["num"]-1
     body = json.dumps(infor)
     channel.basic_publish(exchange='', routing_key=queueName, body=body)
+    connection.close()
 
 def sendResult():
     localIP = get_host_ip()
@@ -52,7 +53,6 @@ def sendResult():
         pika.ConnectionParameters(rmq.getIP(), rmq.getPort(), '/', credentials))
     channel = connection.channel()
     channel.queue_declare(queue=queueResult)
-    channel.basic_qos(prefetch_count=1)
     channel.basic_publish(exchange='', routing_key=queueResult, body=infor)
     connection.close()
     print "sendResult "+infor
@@ -77,6 +77,7 @@ def receiveEnd():
             break
         else:
             channel.basic_publish(exchange='', routing_key=queueEnd, body=body)
+    channel.cancle()
     connection.close()
     print "receiveEnd end"
 
@@ -104,12 +105,19 @@ def receiveWork():
     connection = pika.BlockingConnection(pika.ConnectionParameters(rmq.getIP(), rmq.getPort(), '/', credentials))
     channel = connection.channel()
     channel.queue_declare(queue=queueName)
-    channel.basic_qos(prefetch_count=1)
+    channel.basic_qos(prefetch_count=0)
+    lastUrl = ""
     for method_fram,properties,body in channel.consume(queueName):
         result = json.loads(body)
+        channel.basic_ack(delivery_tag = method_fram.delivery_tag)
+        if lastUrl == result["url"]:
+            result["num"] = result["num"]+1
+            sendWork(result)
+            time.sleep(1)
+            continue
+        #lastUrl = result["url"]
         print "Receive client work: " + body
         runWork(result)
-        channel.basic_ack(delivery_tag = method_fram.delivery_tag)
     requeued_messages = channel.cancle()
     print ('Requeued %i messages' %requeued_messages)
     connection.close()

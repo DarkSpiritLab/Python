@@ -63,19 +63,22 @@ class clientWork:
             pika.ConnectionParameters(self.rabbitMqServerIP, self.rabbitMqServerPort, '/', credentials))
         channel = connectionRabbitMQ.channel()
         channel.queue_declare(queue=self.queueResultName)
-        channel.basic_qos(prefetch_count=1)
+        #channel.basic_qos(prefetch_count=1)
         result = []
         for method_fram, properties, body in channel.consume(self.queueResultName):
             infor = json.loads(body)
-            if result["url"] == self.url:
+            channel.basic_ack(delivery_tag=method_fram.delivery_tag)
+            if infor["url"] == self.url:
                 print "Receive client result: " + body
                 result.append(infor["ip"])
-                channel.basic_ack(delivery_tag=method_fram.delivery_tag)
-                if result.count() == self.num:
+                if len(result) == self.num:
                     break
             else:
+                print "wrong "
                 channel.basic_publish(exchange='', routing_key=self.queueResultName, body=body)
-        connection.close()
+                time.sleep(1)
+        #channel.cancle()
+        connectionRabbitMQ.close()
         return result
 
 

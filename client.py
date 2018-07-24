@@ -9,17 +9,18 @@ import json
 import time
 import pika
 import threading
-import rabbitMq
+import rabbitMq.rabbitMq
 
 queueName = "clientReceive"
 queueEnd = "clientEnd"
 workList = {"url":"xxx.onio","state":True,"level":"1"}
 
+rmq= rabbitMq()
 
 def receiveEnd():
-    credentials = pika.PlainCredentials(rabbitMQ.getUser(), rabbitMq.getPassword())
+    credentials = pika.PlainCredentials(rmq.getUser(), rmq.getPassword())
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(rabbitMq.getIP(), rabbitMq.getPort(), '/', credentials))
+        pika.ConnectionParameters(rmq.getIP(), rmq.getPort(), '/', credentials))
     channel = connection.channel()
     channel.queue_declare(queue=queueName)
     channel.basic_qos(prefetch_count=1)
@@ -52,8 +53,8 @@ def runWork(work):
         urllib2.urlopen(req)
 
 def receiveWork():
-    credentials = pika.PlainCredentials(rabbitMQ.getUser(),rabbitMq.getPassword())
-    connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitMq.getIP(),rabbitMq.getPort(),'/',credentials))
+    credentials = pika.PlainCredentials(rmq.getUser(), rmq.getPassword())
+    connection = pika.BlockingConnection(pika.ConnectionParameters(rmq.getIP(), rmq.getPort(), '/', credentials))
     channel = connection.channel()
     channel.queue_declare(queue=queueName)
     channel.basic_qos(prefetch_count=1)

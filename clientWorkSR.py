@@ -64,9 +64,12 @@ class clientWork:
         result = {}
         for method_fram, properties, body in channel.consume(self.queueResultName):
             result = json.loads(body)
-            print "Receive client result: " + body
-            channel.basic_ack(delivery_tag=method_fram.delivery_tag)
-            break
+            if result["url"] == self.url:
+                print "Receive client result: " + body
+                channel.basic_ack(delivery_tag=method_fram.delivery_tag)
+                break
+            else:
+                channel.basic_publish(exchange='', routing_key=self.queueResultName, body=body)
         connection.close()
         return result
 

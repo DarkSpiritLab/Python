@@ -27,7 +27,8 @@ channelSend = connectionSend.channel()
 channelSend.queue_declare(queue="btcResult")
 
 addresses = list() #btc address  from rabbitmq
-
+x={"addr":"1C1mCxRukix1KfegAY5zQQJV7samAciZpv","onio":"onio","user":"username"}
+addresses.append(x)
 def searchLastblockHash():
     req = urllib2.Request(url_lastblock)
     infor = urllib2.urlopen(req).read()
@@ -44,7 +45,7 @@ def searchTransactionByHash(blockhash):
 
 def sendResultToRabbitMQ(result):
     infor = json.dumps(result)
-    print "Find btc Infor : "+infor
+    #print "Find btc Infor : "+infor
     channelSend.basic_publish(exchange='',routing_key='btcResult',body=infor)
     
 def search():
@@ -57,30 +58,36 @@ def search():
             continue
         else:
             lastBlockHash = lastHash
-        #print lastHash
+        print lastHash
         tran = searchTransactionByHash(lastHash)
+        print "get transaction"
         result = list()
         tranLists = tran["tx"]
+        id =0
         for i in tranLists:
+            id = id +1
             if i.has_key("out") == False:
                 break;
             outLists = i["out"]
-            #print outLists
-            for j in outLists:
-               if j.has_key("addr") == False:
-                   continue
-               for k in addresses:
-                   if k["addr"] == j["addr"]:
-                       item = {"monitor":k,"amount":j["value"],"tx_index":j["tx_index"],"height":tran["height"],"tx":i}
-                       result.append(item)
+            k=addresses[0]
+            j=outLists[0]
+            if not j.has_key("addr"):
+                continue
+            k["addr"]=j["addr"]
+            item = {"monitor":k,"amount":j["value"],"tx_index":j["tx_index"],"height":tran["height"],"tx":i}
+            sendResultToRabbitMQ(item)
+            print str(id)+"  "+k["addr"]
+            #result.append(item)
+            #print str(len(result))+" "+k["addr"]
         #print "\nresult = addrs = "
         #print result
         #print addresses
         print "Btc Addrs now is : " + str(addresses)
-        print "This time find : " + str(result)
+        #print "This time find : " + str(result)
         if result:
             for item in result:
-                sendResultToRabbitMQ(item)
+                id=0
+                #sendResultToRabbitMQ(item)
         time.sleep(30)
 
 def receive():
@@ -100,7 +107,7 @@ def receive():
     connection.close()
 
 if __name__ == "__main__":
-    t = threading.Thread(target=receive)
-    t.start()
+    #t = threading.Thread(target=receive)
+    #t.start()
     search()
     connectionSend.close()

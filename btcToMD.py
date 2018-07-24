@@ -5,6 +5,7 @@ from jinja2 import  Template
 import  pika
 import json
 import urllib
+import time
 import urllib2
 from rabbitMq import rabbitMQ
 
@@ -25,8 +26,8 @@ file = open("btc.md","rb")
 content = file.read().decode("utf-8")
 template = Template(content)
 
-def currencySearch(value , time):
-    url = "https://blockchain.info/frombtc?value="+value+"&currency=CNY&time="+time+"000"
+def currencySearch(value , inTime):
+    url = "https://blockchain.info/frombtc?value="+str(value)+"&currency=CNY&time="+str(inTime)+"000"
     req = urllib2.Request(url)
     infor = urllib2.urlopen(req).read()
     return infor
@@ -34,26 +35,34 @@ def currencySearch(value , time):
 
 def btc2md(body):
     infor = json.loads(body)
+    print infor
     coin_type = "BTC"
     receive_account = infor["monitor"]["addr"]
     onion_site = infor["monitor"]["onio"]
-    username = infor["monitor"]["username"]
+    username = infor["monitor"]["user"]
     send_amount = infor["amount"]
     tx = infor["tx"]
-    time = tx["time"]
-    currency = currencySearch(send_amount,time)
+    thisTime = tx["time"]
+    strTime = time.asctime(time.localtime(float(thisTime)))
+    currency = currencySearch(send_amount,thisTime)
     size =tx["size"]
     output_accounts = list()
     in_amount=0
     out_amount = 0
     for i in tx["out"]:
-        output_accounts.append(i["addr"])
-        out_amount = out_amount + i["value"]
+        if i.has_key("addr"):
+            output_accounts.append(i["addr"])
+            out_amount = out_amount + i["value"]
     input_accounts = list()
     for i in tx["inputs"]:
-        if not i["witness"]:
-            in_accounts.append(i["addr"])
-            in_amount = in_amount+i["value"]
+        x={}
+        #print i
+        if i.has_key("prev_out"):
+            x=i["prev_out"]
+        if x.has_key("addr"):
+            input_accounts.append(x["addr"])
+        if x.has_key("value"):
+            in_amount = in_amount+x["value"]
     hash = tx["hash"]
     weight=tx["weight"]
     fees=in_amount-out_amount
@@ -61,18 +70,16 @@ def btc2md(body):
     block_time=tx["time"]
     url=tx["hash"]
     tx_id = infor["tx_index"]
-    outfileInfor = template.render(coin_type=coin_type,receive_account=receive_account,onion_site=onion_site,username=username,send_amount=send_amount,time=time,currency=currency,size=size,output_accounts=output_accounts,input_accounts=input_accounts,hash=hash,recv_amount=in_amount,weight=weight,fees=fees,block_height=block_height,block_time=block_time,url=url,tx_id=tx_id)
-    outfile = open(hash+str(time)+".md","wb")
-    print "MD : "+hash +"\n INFOR:\n"+outfileInfor
+    outfileInfor = template.render(coin_type=coin_type,receive_account=receive_account,onion_site=onion_site,username=username,send_amount=send_amount,time=strTime,currency=currency,size=size,output_accounts=output_accounts,input_accounts=input_accounts,hash=hash,recv_amount=in_amount,weight=weight,fees=fees,block_height=block_height,block_time=block_time,url=url,tx_id=tx_id)
+    outfile = open(receive_account+"_"+hash+"_"+str(thisTime)+".md","wb")
+    #print "MD : "+hash +"\n INFOR:\n"+outfileInfor
     outfile.write(outfileInfor.encode("utf-8"))
     outfile.close()
 
 
 
-
-
-for method_fram,properties,body in channel.consume("btcAddr"):
-    print "Receive from RabbitMQ!"
+for method_fram,properties,body in channel.consume("btcResult"):
+    print "****************\nReceive from RabbitMQ!"
     btc2md(body)
     channel.basic_ack(delivery_tag = method_fram.delivery_tag)
 

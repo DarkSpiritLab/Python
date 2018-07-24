@@ -1,5 +1,6 @@
 # "clientReceive" -> {"url":"xxx.onio","level":"1,2,3,4,5"}
 # "clientEnd" -> {"url":"xxx.onio","state":False}
+# "clientResult" <-  {"ip":localIP,"url":workList["url"],"level":workList["level"]}
 #!/usr/bin/python
 # -*- coding: UTF-8 -*
 
@@ -8,14 +9,41 @@ import urllib2
 import json
 import time
 import pika
+import os
+import socket
 import threading
 from rabbitMq import rabbitMQ
 rmq= rabbitMQ()
 
 queueName = "clientReceive"
 queueEnd = "clientEnd"
+queueResult = "clientResult"
 workList = {"url":"xxx.onio","state":True,"level":"1"}
 
+localIP = "0.0.0.0"
+
+def get_host_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+    return ip
+
+def sendResult():
+    localIP = get_host_ip()
+    result = {"ip":localIP,"url":workList["url"],"level":workList["level"]}
+    infor = json.dumps(result)
+    credentials = pika.PlainCredentials(rmq.getUser(), rmq.getPassword())
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(rmq.getIP(), rmq.getPort(), '/', credentials))
+    channel = connection.channel()
+    channel.queue_declare(queue=queueResult)
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_publish(exchange='', routing_key=queueResult, body=infor)
+    connection.close()
+    print "sendResult "+infor
 
 
 def receiveEnd():
@@ -50,6 +78,7 @@ def runWork(work):
     t = threading.Thread(target=receiveEnd)
     t.start()
     url = workList["url"]
+    sendResult()
     if not url.startswith("http"):
         url = "http://"+url
     req = urllib2.Request(url)

@@ -2,10 +2,10 @@
 # -*- coding: UTF-8 -*
 
 class rabbitMQ:
-    rabbitMqServerIP = "222.20.73.252"
+    rabbitMqServerIP = "192.168.181.1"
     rabbitMqServerPort = 5672
-    username = "dark"
-    password = "darkGenius"
+    username = "test"
+    password = "test"
     def getIP(self):
         return self.rabbitMqServerIP
     def getPort(self):

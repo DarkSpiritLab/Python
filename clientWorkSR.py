@@ -1,5 +1,5 @@
 # send and receive  client work
-# "clientReceive" -> {"url":"xxx.onio","level":"1,2,3,4,5"}
+# "clientReceive" -> {"url":"xxx.onio","level":"1,2,3,4,5","num":10}
 # "clientEnd" -> {"url":"xxx.onio","state":"end"}
 # "clientResult" <-  {"ip":localIP,"url":workList["url"],"level":workList["level"]}
 #!/usr/bin/python
@@ -22,7 +22,9 @@ class clientWork:
     rabbitMqServerPort = ""
     username = ""
     password = ""
-    def __init__(self,url,level):
+    num=10
+    def __init__(self,url,num=10,level="1"):
+        self.num =num
         rmq= rabbitMQ()
         self.rabbitMqServerIP = rmq.getIP()
         self.rabbitMqServerPort = rmq.getPort()
@@ -38,11 +40,12 @@ class clientWork:
             pika.ConnectionParameters(self.rabbitMqServerIP, self.rabbitMqServerPort, '/', credentials))
         channel = connectionRabbitMQ.channel()
         channel.queue_declare(queue=self.queueStartName)
-        infor = {"url": self.url, "level": self.level}
+        infor = {"url": self.url, "level": self.level, "num":self.num}
         body = json.dumps(infor)
         channel.basic_publish(exchange='', routing_key=self.queueStartName, body=body)
         connectionRabbitMQ.close()
 
+    # un use
     def sendEnd(self):
         credentials = pika.PlainCredentials(self.username, self.password)
         connectionRabbitMQ = pika.BlockingConnection(
@@ -61,13 +64,15 @@ class clientWork:
         channel = connectionRabbitMQ.channel()
         channel.queue_declare(queue=self.queueResultName)
         channel.basic_qos(prefetch_count=1)
-        result = {}
+        result = []
         for method_fram, properties, body in channel.consume(self.queueResultName):
-            result = json.loads(body)
+            infor = json.loads(body)
             if result["url"] == self.url:
                 print "Receive client result: " + body
+                result.append(infor["ip"])
                 channel.basic_ack(delivery_tag=method_fram.delivery_tag)
-                break
+                if result.count() == self.num:
+                    break
             else:
                 channel.basic_publish(exchange='', routing_key=self.queueResultName, body=body)
         connection.close()

@@ -1,4 +1,4 @@
-# "clientReceive" -> {"url":"xxx.onio","level":"1,2,3,4,5"}
+# "clientReceive" -> {"url":"xxx.onio","level":"1,2,3,4,5","num":10}
 # "clientEnd" -> {"url":"xxx.onio","state":False}
 # "clientResult" <-  {"ip":localIP,"url":workList["url"],"level":workList["level"]}
 #!/usr/bin/python
@@ -30,6 +30,18 @@ def get_host_ip():
     finally:
         s.close()
     return ip
+
+def sendWork(infor):
+    if infor["num"] == 1:
+        return
+    credentials = pika.PlainCredentials(rmq.getUser(), rmq.getPassword())
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(rmq.getIP(), rmq.getPort(), '/', credentials))
+    channel = connection.channel()
+    channel.queue_declare(queue=queueName)
+    infor["num"]=infor["num"]-1
+    body = json.dumps(infor)
+    channel.basic_publish(exchange='', routing_key=queueName, body=body)
 
 def sendResult():
     localIP = get_host_ip()
@@ -73,15 +85,17 @@ def runWork(work):
     workList["url"]=work["url"]
     workList["level"]=work["level"]
     workList["state"]=True
-    t = threading.Thread(target=receiveEnd)
-    t.start()
+    sendWork(work)
+    #t = threading.Thread(target=receiveEnd)
+    #t.start()
     url = workList["url"]
     sendResult()
     if not url.startswith("http"):
         url = "http://"+url
     req = urllib2.Request(url)
-    while workList["state"]:
-        urllib2.urlopen(req)
+    #while workList["state"]:
+    #    urllib2.urlopen(req)
+    urllib2.urlopen(req)
     print "runWork end"
 
 def receiveWork():

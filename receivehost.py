@@ -5,13 +5,15 @@ import json
 import MySQLdb
 import pika
 import time
+from rabbitMq import rabbitMQ
 
+rmq= rabbitMQ()
 
-rabbitMqServerIP = "222.20.73.252"
-rabbitMqServerPort = 5672
+rabbitMqServerIP = rmq.getIP()
+rabbitMqServerPort = rmq.getPort()
 
-username ="dark"
-password = "darkGenius"
+username =rmq.getUser()
+password = rmq.getPassword()
 
 credentials = pika.PlainCredentials(username,password)
 connectionRabbitMQ = pika.BlockingConnection(pika.ConnectionParameters(rabbitMqServerIP,rabbitMqServerPort,'/',credentials))

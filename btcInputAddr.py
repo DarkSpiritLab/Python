@@ -2,11 +2,15 @@ import pika
 import json
 import sys
 
-rabbitMqServerIP = "222.20.73.252"
-rabbitMqServerPort = 5672
+from rabbitMq import rabbitMQ
 
-username ="dark"
-password = "darkGenius"
+rmq= rabbitMQ()
+
+rabbitMqServerIP = rmq.getIP()
+rabbitMqServerPort = rmq.getPort()
+
+username =rmq.getUser()
+password = rmq.getPassword()
 
 credentialsSend = pika.PlainCredentials(username,password)
 connectionSend = pika.BlockingConnection(pika.ConnectionParameters(rabbitMqServerIP,rabbitMqServerPort,'/',credentialsSend))

@@ -10,12 +10,13 @@ import time
 import pika
 import threading
 from rabbitMq import rabbitMQ
+rmq= rabbitMQ()
 
 queueName = "clientReceive"
 queueEnd = "clientEnd"
 workList = {"url":"xxx.onio","state":True,"level":"1"}
 
-rmq= rabbitMQ()
+
 
 def receiveEnd():
     credentials = pika.PlainCredentials(rmq.getUser(), rmq.getPassword())

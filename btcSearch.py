@@ -8,13 +8,15 @@ import time
 import pika
 import threading
 #import  pySetting
+from rabbitMq import rabbitMQ
 
+rmq= rabbitMQ()
 
-rabbitMqServerIP = "222.20.73.252"
-rabbitMqServerPort = 5672
+rabbitMqServerIP = rmq.getIP()
+rabbitMqServerPort = rmq.getPort()
 
-username ="dark"
-password = "darkGenius"
+username =rmq.getUser()
+password = rmq.getPassword()
 
 url_lastblock = "http://blockchain.info/latestblock" 
 url_rawblock = "http://blockchain.info/rawblock/"

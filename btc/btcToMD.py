@@ -39,13 +39,13 @@ def  sendReportName(name):
     infor = {"file":name}
     channel.basic_publish(exchange='', routing_key="btcReport", body=json.dumps(infor))
 
-def sendReport(name,addr,mdInfo,thisTime,hash):
+def sendReport(name,addr,hash,thisTime,mdInfo):
     infor = {"fileName":name,"addr":addr,"time":thisTime,"hash":hash,"md":mdInfo}
     channel.basic_publish(exchange='', routing_key="btcReport", body=json.dumps(infor))
 
 def btc2md(body):
     infor = json.loads(body)
-    print infor
+    #print infor
     coin_type = "BTC"
     receive_account = infor["monitor"]["addr"]
     onion_site = infor["monitor"]["onio"]

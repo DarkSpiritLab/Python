@@ -5,7 +5,7 @@
 # -*- coding: UTF-8 -*
 
 import urllib
-import urllib2
+from urllib import request
 import json
 import time
 import pika
@@ -15,6 +15,7 @@ import threading
 from rabbitMq import rabbitMQ
 rmq= rabbitMQ()
 
+httpAgent = 'http://127.0.0.1:9011/'
 queueName = "clientReceive"
 queueEnd = "clientEnd"
 queueResult = "clientResult"
@@ -55,11 +56,11 @@ def sendResult():
     channel.queue_declare(queue=queueResult)
     channel.basic_publish(exchange='', routing_key=queueResult, body=infor)
     connection.close()
-    print "sendResult "+infor
+    print("sendResult "+infor)
 
 
 def receiveEnd():
-    print "receiveEnd start"
+    print("receiveEnd start")
     credentials = pika.PlainCredentials(rmq.getUser(), rmq.getPassword())
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(rmq.getIP(), rmq.getPort(), '/', credentials))
@@ -69,7 +70,7 @@ def receiveEnd():
     global  workList
     for method_fram, properties, body in channel.consume(queueEnd):
         result = json.loads(body)
-        print "Receive client end: " + body
+        print("Receive client end: " + body)
         #workList.append(result)
         channel.basic_ack(delivery_tag=method_fram.delivery_tag)
         if result["url"]  == workList["url"]:
@@ -79,10 +80,10 @@ def receiveEnd():
             channel.basic_publish(exchange='', routing_key=queueEnd, body=body)
     channel.cancle()
     connection.close()
-    print "receiveEnd end"
+    print("receiveEnd end")
 
 def runWork(work):
-    print "runWork start"
+    print("runWork start")
     workList["url"]=work["url"]
     workList["level"]=work["level"]
     workList["state"]=True
@@ -93,17 +94,13 @@ def runWork(work):
     sendResult()
     if not url.startswith("http"):
         url = "http://"+url
-    #req = urllib2.Request(url)
-    #while workList["state"]:
-    #    urllib2.urlopen(req)
-    #urllib2.urlopen(req)
-    proxy_handler = urllib2.ProxyHandler({"http":'127.0.0.1:'})
-    opener = urllib2.build_opener(proxy_handler)
+    proxy_handler = urllib.request.ProxyHandler({'http': httpAgent})
+    opener = urllib.request.build_opener(proxy_handler)
     opener.open(url)
-    print "runWork end"
+    print("runWork end")
 
 def receiveWork():
-    print "receiveWork start"
+    print("receiveWork start")
     credentials = pika.PlainCredentials(rmq.getUser(), rmq.getPassword())
     connection = pika.BlockingConnection(pika.ConnectionParameters(rmq.getIP(), rmq.getPort(), '/', credentials))
     channel = connection.channel()
@@ -119,12 +116,12 @@ def receiveWork():
             time.sleep(1)
             continue
         #lastUrl = result["url"]
-        print "Receive client work: " + body
+        print("Receive client work: " + str(body))
         runWork(result)
     requeued_messages = channel.cancle()
-    print ('Requeued %i messages' %requeued_messages)
+    print('Requeued %i messages' %requeued_messages)
     connection.close()
-    print "receiveWork end"
+    print("receiveWork end")
 
 if __name__ == "__main__":
     receiveWork()

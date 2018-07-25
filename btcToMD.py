@@ -1,5 +1,6 @@
 #"btcAddr"  ->    addresses.append({"addr":"1C1mCxRukix1KfegAY5zQQJV7samAciZpv","onio":"onio","user":"username"})
 #result.append({"monitor":{},"tx":{}})  ->    "btcResult"
+#"btcReport" <- {"file":name}
 
 from jinja2 import  Template
 import  pika
@@ -21,7 +22,9 @@ credentials = pika.PlainCredentials(username,password)
 connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitMqServerIP,rabbitMqServerPort,'/',credentials))
 channel= connection.channel()
 channel.queue_declare(queue="btcResult")
-
+channel.basic_qos(prefetch_count=1)
+channelSendResult =connection.channel()
+channelSendResult.queue_declare(queue="btcReport")
 file = open("btc.md","rb")
 content = file.read().decode("utf-8")
 template = Template(content)
@@ -31,6 +34,10 @@ def currencySearch(value , inTime):
     req = urllib2.Request(url)
     infor = urllib2.urlopen(req).read()
     return infor
+
+def  sendReportName(name):
+    infor = {"file":name}
+    channel.basic_publish(exchange='', routing_key="btcReport", body=json.dumps(infor))
 
 
 def btc2md(body):
@@ -71,7 +78,10 @@ def btc2md(body):
     url=tx["hash"]
     tx_id = infor["tx_index"]
     outfileInfor = template.render(coin_type=coin_type,receive_account=receive_account,onion_site=onion_site,username=username,send_amount=send_amount,time=strTime,currency=currency,size=size,output_accounts=output_accounts,input_accounts=input_accounts,hash=hash,recv_amount=in_amount,weight=weight,fees=fees,block_height=block_height,block_time=block_time,url=url,tx_id=tx_id)
-    outfile = open(receive_account+"_"+hash+"_"+str(thisTime)+".md","wb")
+    fileName =receive_account+"_"+hash+"_"+str(thisTime)+".md"
+    outfile = open(fileName,"wb")
+    print fileName
+    sendReportName(fileName)
     #print "MD : "+hash +"\n INFOR:\n"+outfileInfor
     outfile.write(outfileInfor.encode("utf-8"))
     outfile.close()

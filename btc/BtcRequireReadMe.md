@@ -10,7 +10,8 @@
 		
 	环境：python2.7 pika jinja2	
 	
-	生成Markdown文件，文件名为“钱包地址_交易哈希_时间戳.md”,同时将文件名发送到"btcReport" <- {"file":name}队列中
+	将内容发送到"btcReport" <- {"fileName":name,"addr":addr,"time":thisTime,"hash":hash,"md":mdInfo}队列中。
+	内容依次为 文件名（文件名为“钱包地址_交易哈希_时间戳.md“），钱包地址，交易时间（字符串），交易的哈希，md内容
 	
 ##### 2. btcSearch.py 
 	

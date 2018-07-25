@@ -91,12 +91,18 @@ def runWork(work):
     #t = threading.Thread(target=receiveEnd)
     #t.start()
     url = workList["url"]
-    sendResult()
     if not url.startswith("http"):
         url = "http://"+url
-    proxy_handler = urllib.request.ProxyHandler({'http': httpAgent})
-    opener = urllib.request.build_opener(proxy_handler)
-    opener.open(url)
+    try:
+        proxy_handler = urllib.request.ProxyHandler({'http': httpAgent})
+        opener = urllib.request.build_opener(proxy_handler)
+        opener.open(url)
+        sendResult()
+        print("Success: "+url)
+    except:
+        print("Fail: "+url)
+        work["num"] = 2
+        sendWork(work)
     print("runWork end")
 
 def receiveWork():
@@ -107,15 +113,19 @@ def receiveWork():
     channel.queue_declare(queue=queueName)
     channel.basic_qos(prefetch_count=0)
     lastUrl = ""
+    number = 30  # receive same work tell number
     for method_fram,properties,body in channel.consume(queueName):
         result = json.loads(body)
         channel.basic_ack(delivery_tag = method_fram.delivery_tag)
         if lastUrl == result["url"]:
-            result["num"] = result["num"]+1
-            sendWork(result)
-            time.sleep(1)
-            continue
-        #lastUrl = result["url"]
+            number -= 1
+            if number !=0:
+                result["num"] = result["num"]+1
+                sendWork(result)
+                time.sleep(1)
+                continue
+        number = 30
+        lastUrl = result["url"]
         print("Receive client work: " + str(body))
         runWork(result)
     requeued_messages = channel.cancle()

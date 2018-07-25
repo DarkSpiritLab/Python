@@ -81,7 +81,7 @@ def search():
         if result:
             for item in result:
                 sendResultToRabbitMQ(item)
-        time.sleep(30)
+        time.sleep(60*5)
 
 def receive():
     credentials = pika.PlainCredentials(username,password)

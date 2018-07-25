@@ -15,11 +15,14 @@ if __name__ == "__main__":
         pid2 = os.fork()
         if not pid2:
             #child
-            print("btcSearch end!")
+            print("btcSearch start!")
             os.system("python btcSearch.py")
             print("btcToSearch end!")
         else:
             print ("all open")
+            while True:
+                 a = 1+1
+
 
 
 

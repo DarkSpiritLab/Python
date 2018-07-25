@@ -18,6 +18,7 @@ channelSend = connectionSend.channel()
 channelSend.queue_declare(queue="btcAddr")
 
 btcAddr = {"addr":str(sys.argv[1]),"onio":"testOnio.onio","user":"testUserName"}
+print(btcAddr)
 infor = json.dumps(btcAddr)
 
 channelSend.basic_publish(exchange='', routing_key='btcAddr', body=infor)

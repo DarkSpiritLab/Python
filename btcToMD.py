@@ -33,7 +33,7 @@ def currencySearch(value , inTime):
     url = "https://blockchain.info/frombtc?value="+str(value)+"&currency=CNY&time="+str(inTime)+"000"
     req = urllib2.Request(url)
     infor = urllib2.urlopen(req).read()
-    return infor
+    return str(infor)+" CNY"
 
 def  sendReportName(name):
     infor = {"file":name}

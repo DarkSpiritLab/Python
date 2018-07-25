@@ -18,7 +18,7 @@
 
 {{ client_ip }} -> (tor_relays) ->
 {% for i in path %}
-{{ i.describe }} -> 
+{{ i }} -> 
 {% endfor %}
 {{ ip_address }}
 
@@ -27,7 +27,7 @@
 |项目|值|
 | ---- | --- |
 {% for i in clients %}
-| Client {{ i.index }} | {{ i.describe }} |
+| Client {{ loop.index }} | {{ i }} |
 {% endfor %}
 
 连接信息:

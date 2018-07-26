@@ -2,12 +2,8 @@ from jinja2 import  Template
 import json
 import time
 from urllib import request
-
-infor = {"id":"id","start_time":15645645,"finish_time":464654,"tor_address":"asd4f54.onio",
-         "site_name":"site_name","ip_address":"127.0.0.1",
-         "service_type":"bbs","client_ip":"ip who find","path":["relay ip 1","relay ip 2"],
-         "clients":["client1","client2","client3"],"stream_id":"stream_id","circ_id":["1","2","3","4"],
-         "details":"details"}
+import pika
+from ORM import *
 
 def getCountry(ip):
     url = "http://ip.taobao.com/service/getIpInfo.php?ip="+str(ip)
@@ -43,9 +39,26 @@ class traceReport:
         outfileInfor = self.template.render(**infor)
         return outfileInfor
 
+    def start(self):
+        """
+        do  what
+        :return:
+        """
+        pass
 
-temp = traceReport()
-x = json.dumps(infor)
-with open("result.md","wb") as f:
-    infor =temp.trace2md(x)
-    f.write(infor.encode("utf8"))
+    def searchInfor(self,input):
+        infor = {"id": "id", "start_time": 15645645, "finish_time": 464654, "tor_address": "asd4f54.onio",
+                 "site_name": "site_name", "ip_address": "127.0.0.1",
+                 "service_type": "bbs", "client_ip": "ip who find", "path": ["relay ip 1", "relay ip 2"],
+                 "clients": ["client1", "client2", "client3"], "stream_id": "stream_id",
+                 "circ_id": ["1", "2", "3", "4"],
+                 "details": "details"}
+        """
+        find  infor value
+        """
+        result=self.trace2md(infor)
+
+
+
+
+

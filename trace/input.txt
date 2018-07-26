@@ -1,0 +1,14 @@
+{"id": "id",                  // 报告id
+ "start_time": 15645645,      // 任务发起时间
+ "finish_time": 464654,       // 任务结束时间
+ "tor_address": "asd4f54.onio",  // tor域名
+ "site_name": "site_name",      // 网站名---没有就算了
+ "ip_address": "127.0.0.1",     // 溯源得到的匿名服务器ip
+ "service_type": "bbs",         // 网站的类型---没有就算了
+ "client_ip": "ip who find",     // 溯源成功的 起始的客户端ip
+ "path": ["relay ip 1", "relay ip 2"],   //  中间节点的ip
+ "clients": ["client1", "client2", "client3"],   //接受溯源任务的客户端ip--没有就算了
+ "stream_id": "stream_id",        //  --没有就算了
+ "circ_id": ["1", "2", "3", "4"],       // 中间4个rely节点的cell id
+ "details": "details"            //  相关ip的信息 ---这个我找找
+ }

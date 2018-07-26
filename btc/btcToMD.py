@@ -23,25 +23,30 @@ connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitMqServerIP,
 channel= connection.channel()
 channel.queue_declare(queue="btcResult")
 channel.basic_qos(prefetch_count=1)
-channelSendResult =connection.channel()
-channelSendResult.queue_declare(queue="btcReport")
 file = open("btc.md","rb")
 content = file.read().decode("utf-8")
 template = Template(content)
 
 def currencySearch(value , inTime):
     url = "https://blockchain.info/frombtc?value="+str(value)+"&currency=CNY&time="+str(inTime)+"000"
-    req = urllib2.Request(url)
-    infor = urllib2.urlopen(req).read()
-    return str(infor)+" CNY"
+    resultStr = ""
+    try:
+        req = urllib2.Request(url)
+        infor = urllib2.urlopen(req).read()
+        resultStr = str(infor)+" CNY"
+    except:
+        resultStr = str(value)+" sat"
+    return resultStr
 
 def  sendReportName(name):
     infor = {"file":name}
     channel.basic_publish(exchange='', routing_key="btcReport", body=json.dumps(infor))
 
 def sendReport(name,addr,hash,thisTime,mdInfo):
+    channelSendResult = connection.channel()
+    channelSendResult.queue_declare(queue="btcReport")
     infor = {"fileName":name,"addr":addr,"time":thisTime,"hash":hash,"md":mdInfo}
-    channel.basic_publish(exchange='', routing_key="btcReport", body=json.dumps(infor))
+    channelSendResult.basic_publish(exchange='', routing_key="btcReport", body=json.dumps(infor))
 
 def btc2md(body):
     infor = json.loads(body)

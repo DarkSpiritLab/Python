@@ -1,4 +1,4 @@
-# 溯源报告
+﻿# 溯源报告
 报告ID： {{ id }}
 
 |项目|值|
@@ -16,7 +16,7 @@
 
 ## 探测路径参数：
 
-{{ client_ip }} -> (tor_relays) ->
+{{ client_ip }} ->
 {% for i in path %}
 {{ i }} -> 
 {% endfor %}
@@ -26,8 +26,7 @@
 
 |项目|值|
 | ---- | --- |
-{% for i in clients %}
-| Client {{ loop.index }} | {{ i }} |
+{% for i in clients %}| Client {{ loop.index }} | {{ i }} |
 {% endfor %}
 
 连接信息:

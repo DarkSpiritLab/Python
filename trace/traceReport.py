@@ -11,11 +11,20 @@ infor = {"id":"id","start_time":15645645,"finish_time":464654,"tor_address":"asd
 
 def getCountry(ip):
     url = "http://ip.taobao.com/service/getIpInfo.php?ip="+str(ip)
-    response = request.urlopen(ip)
-    infor=response.read()
-    infor=infor.decode("utf8")
-    infor = json.loads(infor)
-    return infor["country"]+infor["region"]
+    response = request.urlopen(url)
+    infor=response.read().decode("utf8")
+    inforJson = json.loads(infor)
+    inforJson=inforJson["data"]
+    strLocal = ""
+    if inforJson["country"] != "XX":
+        strLocal += inforJson["country"]
+    if inforJson["region"] != "XX":
+        strLocal += inforJson["region"]
+    if inforJson["city"] != "XX":
+        strLocal += inforJson["city"]
+    if strLocal == "":
+        strLocal = "未知"
+    return strLocal
 
 class traceReport:
     content = ""
@@ -32,9 +41,11 @@ class traceReport:
         infor["start_time"]=time.asctime(time.localtime(float(infor["start_time"])))
         infor["finish_time"]=time.asctime(time.localtime(float(infor["finish_time"])))
         outfileInfor = self.template.render(**infor)
-        return outfileInfor.encode("utf-8")
+        return outfileInfor
 
 
 temp = traceReport()
 x = json.dumps(infor)
-print(temp.trace2md(x))
+with open("result.md","wb") as f:
+    infor =temp.trace2md(x)
+    f.write(infor.encode("utf8"))
